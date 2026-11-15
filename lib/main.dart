@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const MaterialApp(
-  debugShowCheckedModeBanner: false,
-  home: MahasiswaPage(),
-));
+void main() => runApp(
+  const MaterialApp(debugShowCheckedModeBanner: false, home: MahasiswaPage()),
+);
 
 class MahasiswaPage extends StatefulWidget {
   const MahasiswaPage({super.key});
@@ -13,67 +12,73 @@ class MahasiswaPage extends StatefulWidget {
 }
 
 class _MahasiswaPageState extends State<MahasiswaPage> {
+  // TAHAP 1: Inisialisasi data sementara di RAM.
+  final List<Map<String, String>> mahasiswa = [
+    {
+      'id': '1',
+      'nim': '2026001',
+      'nama': 'Andi',
+      'prodi': 'Informatika',
+      'ipk': '4',
+    },
+    {
+      'id': '2',
+      'nim': '2026002',
+      'nama': 'Siti',
+      'prodi': 'Informatika',
+      'ipk': '3,8',
+    },
+  ];
+  int nextId = 3;
 
-// TAHAP 1: Inisialisasi data sementara di RAM.
-final List<Map<String, String>> mahasiswa = [
-  {'id': '1', 'nim': '2026001', 'nama': 'Andi', 'prodi': 'Informatika'},
-  {'id': '2', 'nim': '2026002', 'nama': 'Siti', 'prodi': 'Informatika'},
-];
-int nextId = 3;
+  // TAHAP 3: CREATE. Form mengembalikan data baru.
+  Future<void> tambahData() async {
+    final hasil = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (_) => MahasiswaForm(dataSudahAda: mahasiswa),
+    );
+    if (!mounted || hasil == null) return;
+    setState(() {
+      mahasiswa.add({'id': '${nextId++}', ...hasil});
+    });
+  }
 
-// TAHAP 3: CREATE. Form mengembalikan data baru.
-Future<void> tambahData() async {
-  final hasil = await showDialog<Map<String, String>>(
-    context: context,
-    builder: (_) => MahasiswaForm(dataSudahAda: mahasiswa),
-  );
-  if (!mounted || hasil == null) return;
-  setState(() {
-    mahasiswa.add({'id': '${nextId++}', ...hasil});
-  });
-}
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(title: const Text('Praktikum 7: Data Mahasiswa')),
-    body: 
-
-Column(children: [
-
-Padding(
-  padding: const EdgeInsets.all(12),
-  child: Text('Data tersimpan: ${mahasiswa.length}'),
-),
-Expanded(
-  child: ListView.builder(
-    itemCount: 
-
-mahasiswa.length,
-
-itemBuilder: (context, index) {
-  final item = 
-
-mahasiswa[index];
-
-return Card(
-  child: ListTile(
-    title: Text(item['nama']!),
-    subtitle: Text('${item['nim']} | ${item['prodi']}'),
-
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Praktikum 7: Data Mahasiswa')),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text('Data tersimpan: ${mahasiswa.length}'),
           ),
-        );
-      },
-    ),
-  ),
-]),
+          Expanded(
+            child: ListView.builder(
+              itemCount: mahasiswa.length,
 
-floatingActionButton: FloatingActionButton.extended(
-  onPressed: tambahData,
-  icon: const Icon(Icons.add),
-  label: const Text('Tambah'),
-),
+              itemBuilder: (context, index) {
+                final item = mahasiswa[index];
 
+                return Card(
+                  child: ListTile(
+                    title: Text(item['nama']!),
+                    subtitle: Text(
+                      '${item['nim']} | ${item['prodi']} | ${item['ipk']} ',
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: tambahData,
+        icon: const Icon(Icons.add),
+        label: const Text('Tambah'),
+      ),
     );
   }
 }
@@ -94,6 +99,7 @@ class _MahasiswaFormState extends State<MahasiswaForm> {
   late final TextEditingController nim;
   late final TextEditingController nama;
   late final TextEditingController prodi;
+  late final TextEditingController ipk;
 
   @override
   void initState() {
@@ -101,6 +107,7 @@ class _MahasiswaFormState extends State<MahasiswaForm> {
     nim = TextEditingController(text: widget.dataAwal?['nim'] ?? '');
     nama = TextEditingController(text: widget.dataAwal?['nama'] ?? '');
     prodi = TextEditingController(text: widget.dataAwal?['prodi'] ?? '');
+    ipk = TextEditingController(text: widget.dataAwal?['ipk'] ?? '');
   }
 
   @override
@@ -108,6 +115,7 @@ class _MahasiswaFormState extends State<MahasiswaForm> {
     nim.dispose();
     nama.dispose();
     prodi.dispose();
+    ipk.dispose();
     super.dispose();
   }
 
@@ -127,8 +135,9 @@ class _MahasiswaFormState extends State<MahasiswaForm> {
                 validator: (value) {
                   final v = value?.trim() ?? '';
                   if (v.isEmpty) return 'NIM wajib diisi';
-                  final sudahAda = widget.dataSudahAda.any((m) =>
-                    m['nim'] == v && m['id'] != widget.dataAwal?['id']);
+                  final sudahAda = widget.dataSudahAda.any(
+                    (m) => m['nim'] == v && m['id'] != widget.dataAwal?['id'],
+                  );
                   if (sudahAda) return 'NIM sudah digunakan';
                   return null;
                 },
@@ -136,14 +145,22 @@ class _MahasiswaFormState extends State<MahasiswaForm> {
               TextFormField(
                 controller: nama,
                 decoration: const InputDecoration(labelText: 'Nama'),
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Nama wajib diisi' : null,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Nama wajib diisi' : null,
               ),
               TextFormField(
                 controller: prodi,
                 decoration: const InputDecoration(labelText: 'Prodi'),
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Prodi wajib diisi' : null,
+                    ? 'Prodi wajib diisi'
+                    : null,
+              ),
+
+              TextFormField(
+                controller: ipk,
+                decoration: const InputDecoration(labelText: 'ipk'),
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'ipk wajib diisi' : null,
               ),
             ],
           ),
@@ -161,6 +178,7 @@ class _MahasiswaFormState extends State<MahasiswaForm> {
               'nim': nim.text.trim(),
               'nama': nama.text.trim(),
               'prodi': prodi.text.trim(),
+              'ipk': ipk.text.trim(),
             });
           },
           child: const Text('Simpan'),
