@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(
-  const MaterialApp(debugShowCheckedModeBanner: false, home: MahasiswaPage()),
-);
+void main() => runApp(const MaterialApp(
+  debugShowCheckedModeBanner: false,
+  home: MahasiswaPage(),
+));
 
 class MahasiswaPage extends StatefulWidget {
   const MahasiswaPage({super.key});
@@ -12,11 +13,24 @@ class MahasiswaPage extends StatefulWidget {
 }
 
 class _MahasiswaPageState extends State<MahasiswaPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Praktikum 7: Data Mahasiswa')),
-      body: const Center(child: Text('Tahap 0: kerangka aplikasi')),
+
+// TAHAP 1: Inisialisasi data sementara di RAM.
+final List<Map<String, String>> mahasiswa = [
+  {'id': '1', 'nim': '2026001', 'nama': 'Andi', 'prodi': 'Informatika'},
+  {'id': '2', 'nim': '2026002', 'nama': 'Siti', 'prodi': 'Informatika'},
+];
+int nextId = 3;
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(title: const Text('Praktikum 7: Data Mahasiswa')),
+    body: 
+
+Center(child: Text(
+  'Tahap 1: jumlah data awal = ${mahasiswa.length}',
+)),
+
     );
   }
 }
