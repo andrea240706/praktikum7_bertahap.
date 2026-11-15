@@ -27,9 +27,34 @@ Widget build(BuildContext context) {
     appBar: AppBar(title: const Text('Praktikum 7: Data Mahasiswa')),
     body: 
 
-Center(child: Text(
-  'Tahap 1: jumlah data awal = ${mahasiswa.length}',
-)),
+Column(children: [
+
+Padding(
+  padding: const EdgeInsets.all(12),
+  child: Text('Data tersimpan: ${mahasiswa.length}'),
+),
+Expanded(
+  child: ListView.builder(
+    itemCount: 
+
+mahasiswa.length,
+
+itemBuilder: (context, index) {
+  final item = 
+
+mahasiswa[index];
+
+return Card(
+  child: ListTile(
+    title: Text(item['nama']!),
+    subtitle: Text('${item['nim']} | ${item['prodi']}'),
+
+          ),
+        );
+      },
+    ),
+  ),
+]),
 
     );
   }
