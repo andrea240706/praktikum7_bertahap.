@@ -43,6 +43,46 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
     });
   }
 
+  // TAHAP 4: UPDATE berdasarkan id, BUKAN indeks ListView.
+  Future<void> ubahData(Map<String, String> dipilih) async {
+    final hasil = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (_) => MahasiswaForm(
+        dataAwal: dipilih,
+        dataSudahAda: mahasiswa,
+      ),
+    );
+    if (!mounted || hasil == null) return;
+    final index = mahasiswa.indexWhere((m) => m['id'] == dipilih['id']);
+    if (index < 0) return;
+    setState(() {
+      mahasiswa[index] = {'id': dipilih['id']!, ...hasil};
+    });
+  }
+
+  // TAHAP 5: DELETE dengan dialog konfirmasi.
+  Future<void> hapusData(Map<String, String> dipilih) async {
+    final setuju = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Hapus data?'),
+        content: Text('Hapus ${dipilih['nama']}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || setuju != true) return;
+    setState(() => mahasiswa.removeWhere((m) => m['id'] == dipilih['id']));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,6 +105,21 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
                     title: Text(item['nama']!),
                     subtitle: Text(
                       '${item['nim']} | ${item['prodi']} | ${item['ipk']} ',
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          tooltip: 'Ubah',
+                          icon: const Icon(Icons.edit),
+                          onPressed: () => ubahData(item),
+                        ),
+                        IconButton(
+                          tooltip: 'Hapus',
+                          icon: const Icon(Icons.delete),
+                          onPressed: () => hapusData(item),
+                        ),
+                      ],
                     ),
                   ),
                 );
